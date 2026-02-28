@@ -1,0 +1,25 @@
+# LLM client (LM Studio OpenAI-compatible API)
+openai>=1.0.0
+
+# FastAPI server
+fastapi
+uvicorn[standard]
+
+# Validation / schemas
+pydantic
+
+# Environment variables
+python-dotenv
+
+# HTTP client (optional but cleaner)
+httpx
+
+# Logging utilities
+loguru
+
+# Progress / benchmarking
+tqdm
+
+streamlit 
+qrcode
+pillow
