@@ -243,15 +243,12 @@ def count_total_offenses(conn) -> int:
 # ──────────────────────────────────────────────
 
 def get_recent_incidents(conn, limit: int = 20) -> list[dict]:
-    """
-    Fetch recent incidents joined with worker info.
-    """
     cursor = conn.cursor(dictionary=True)
     cursor.execute(
         """
         SELECT i.*, w.employee_id, w.full_name, w.role, w.department
         FROM incidents i
-        JOIN workers w ON i.worker_id = w.id
+        LEFT JOIN workers w ON i.worker_id = w.id
         ORDER BY i.id DESC
         LIMIT %s
         """,

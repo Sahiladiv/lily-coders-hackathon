@@ -25,6 +25,7 @@ from app.core.state import (
 )
 from app.core.guardrails import parse_llm_output, ParseError
 from app.llm.gemma_client import analyze_image
+from app.llm.fallback import analyze_ppe_with_openai
 from app.llm.prompts import format_report
 from app.llm.client import rephrase_report
 # from app.storage.sqlite import get_connection, log_incident, count_offenses
@@ -59,8 +60,13 @@ def analyze_node(state: WorkflowState) -> WorkflowState:
 
     try:
         # Call LM Studio
-        raw_output = analyze_image(image_path)
+        # raw_output = analyze_image(image_path)
 
+        # if not raw_output:
+            # print("Empty response from Gemma")
+
+        raw_output = analyze_ppe_with_openai(image_path)
+        print(f"OpenAI Fallback Output:\n{raw_output}\n")  # Debug print
         # Strict parse
         parsed = parse_llm_output(raw_output)
 
@@ -299,48 +305,6 @@ def act_node(state: WorkflowState) -> WorkflowState:
         # ── Report ──
         template_report = format_report(incident_id, timestamp, validated, escalation.value)
         
-        # template_report = """
-        #     ==================================================
-        #     INCIDENT REPORT
-        #     ==================================================
-
-        #     Incident ID:       1024
-        #     Timestamp:         2026-02-28 10:45:12
-
-        #     FINAL DECISION:    NON-COMPLIANT
-        #     Severity Level:    HIGH
-        #     Compliance Score:  62
-        #     Override Applied:  False
-
-        #     --------------------------------------------------
-        #     PPE ANALYSIS
-        #     --------------------------------------------------
-        #     Detected PPE:      Hard Hat, Safety Vest
-        #     Missing PPE:       Safety Goggles, Gloves
-        #     Detection Confidence: 0.91
-
-        #     --------------------------------------------------
-        #     OSHA VIOLATIONS
-        #     --------------------------------------------------
-        #     - 1926.102(a)(1): Eye and face protection required where hazards exist
-        #     - 1910.138(a): Hand protection required when employees' hands are exposed to hazards
-
-        #     --------------------------------------------------
-        #     CORRECTIVE ACTIONS
-        #     --------------------------------------------------
-        #     - Immediately provide safety goggles and gloves
-        #     - Conduct toolbox talk on mandatory PPE compliance
-        #     - Reinspect site within 24 hours
-
-        #     --------------------------------------------------
-        #     ESCALATION PATH
-        #     --------------------------------------------------
-        #     Supervisor Review
-
-        #     ==================================================
-        #     END OF REPORT
-        #     ==================================================
-        #     """
 
         # Optional: LLM rephrase (safe fallback to template)
         final_report = rephrase_report(template_report)

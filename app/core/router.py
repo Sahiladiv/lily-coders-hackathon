@@ -60,6 +60,14 @@ def _handle_get_incidents(args: dict) -> dict:
     conn = get_connection()
     try:
         incidents = get_recent_incidents(conn, limit=limit)
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT COUNT(*) as cnt FROM incidents")
+        total = cursor.fetchone()
+        print(f"[DEBUG] Total incidents in DB: {total}")
+        cursor.close()
+
+        incidents = get_recent_incidents(conn, limit=limit)
+        print(f"[DEBUG] Returned incidents: {len(incidents)}")
         return {
             "success": True,
             "tool": "get_incidents",

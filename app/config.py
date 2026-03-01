@@ -15,7 +15,7 @@ MYSQL_CONFIG = {
 }
 
 # ──────────────────────────────────────────────
-# LM Studio / Ollama Configuration
+# LM Studio Configuration
 # ──────────────────────────────────────────────
 LM_STUDIO_BASE_URL = "http://localhost:1234/v1"
 
